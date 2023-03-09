@@ -1,0 +1,29 @@
+function []=cmeans(type,n)
+str=strcat(type,'_lv8760.mat');
+
+data=load(str);
+data=data.ldlv;
+% data(:,end)=[];
+options=[2;1e5;1e-6;0];
+tic;
+[ldlv,u,~]=FCMCluster(data,n,options);
+time =toc;
+[~,num]=max(u);
+dim=size(ldlv,2);
+for i=1:n
+    ldlv(i,dim+1)=size(find(num==i),2);
+end
+if dim == 1
+ldlv=sortrows(ldlv,-1);
+end
+if dim == 17
+    cc = [1.08000000000000;0.970000000000000;1.80000000000000;0.740000000000000;0.710000000000000;1.36000000000000;1.25000000000000;1.71000000000000;1.75000000000000;1.95000000000000;2.65000000000000;1.94000000000000;3.17000000000000;1;3.33000000000000;1.81000000000000;1.28000000000000];
+    for i = 1 : n
+          ldlv(i,end+1)=sum(cc.*ldlv(i,1:dim)');
+    end
+    ldlv=sortrows(ldlv,-(dim+2));
+    ldlv(:,end) =[];
+end
+
+str=strcat(type,'_lv',num2str(n),'.mat');
+save(str,'ldlv','time');
